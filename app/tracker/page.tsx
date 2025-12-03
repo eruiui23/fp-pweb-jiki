@@ -1,5 +1,8 @@
 "use client"
-import { useState } from "react"
+
+import { useState, useEffect, CSSProperties } from "react"
+// import ProductivityTimer from "@/component/ProductivityTimer"; 
+import Timer from "@/component/Timer";
 
 function StrStpButton() {
     let initialText = "Start"
@@ -8,7 +11,7 @@ function StrStpButton() {
     const [isRunning, setIsRunning] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
 
-    const[buttonText, setButtonText] = useState("Start")
+    const [buttonText, setButtonText] = useState("Start")
 
     const handleButton = () => {
         if (!isRunning || isPaused) {
@@ -17,36 +20,44 @@ function StrStpButton() {
             setIsPaused(false)
         }
 
-        else if ( !isPaused) {
+        else if (!isPaused) {
             setButtonText("Continue")
             setIsPaused(true)
-        } 
+        }
     }
 
     const handleEnd = () => {
         setIsRunning(false)
         setIsPaused(false)
         alert("Timer selesai!")
-        // logic save data :D
+        setButtonText(("Start")
+        )
     }
 
-    return (        
-            
-        <div className="bg-amber-200 text-center">
+    return (
+
+        <div className=" text-center flex flex-col gap 4 justify-between h-25">
             <button className="btn" onClick={() => handleButton()}>{buttonText}</button>
             {
                 isPaused && isRunning && (
-                    <button className="btn " onClick={handleEnd}>End</button>
+                    <button className="btn" onClick={handleEnd}>End</button>
                 )
             }
         </div>
     )
 }
 
-function Timer() {
+// function Timer() {
+//     let counter = 10
+//     return (
+//         <div>
+//         </div>
+//     )
 
 
-}
+// }
+
+
 
 function Stopwatch() {
 
@@ -61,9 +72,10 @@ export default function Tracker() {
                 <button className="btn">Stopwatch</button>
             </div>
             <p>nama task</p>
-            <div className=" bg-blue-400 text-7xl p-5">25:12</div>
-            <button>ini button buat play puse dll</button>
-            <StrStpButton/>
+            
+            <Timer/>
+            {/* <div className=" bg-blue-400 text-7xl p-5">25:12</div>
+            <StrStpButton /> */}
         </div>
     )
 }
