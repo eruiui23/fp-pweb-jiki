@@ -45,6 +45,7 @@ model Tracker {
   tracker_id   String @id @default(cuid()) @map("_id")
   tracker_type String
   duration     Int
+  date         DateTime @default(now())
   userId       String
   user         User   @relation(fields: [userId], references: [usn])
   taskId       String?

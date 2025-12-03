@@ -44,12 +44,14 @@ export const UpdateTaskSchema = z.object({
 export const CreateTrackerSchema = z.object({
   tracker_type: z.string().min(1, "Tracker type is required"),
   duration: z.number().int().positive("Duration must be positive"),
+  date: z.coerce.date().optional(),
   taskId: z.string().optional(),
 });
 
 export const UpdateTrackerSchema = z.object({
   tracker_type: z.string().min(1).optional(),
   duration: z.number().int().positive().optional(),
+  date: z.coerce.date().optional(),
   taskId: z.string().optional(),
 });
 
