@@ -1,5 +1,5 @@
 // app/login/page.tsx
-import Link from "next/link"; // Component khusus Next.js buat pindah halaman
+import Link from "next/link"; 
 
 export default function LoginPage() {
     return (
@@ -14,6 +14,15 @@ export default function LoginPage() {
                 <input type="password" className="input" placeholder="Password" />
 
                 <button className="btn btn-neutral mt-4">Login</button>
+
+                {/* --- TAMBAHAN LINK KE REGISTER DI SINI --- */}
+                <div className="text-center mt-4 text-sm text-gray-600">
+                    Belum punya akun?{" "}
+                    <Link href="/register" className="link link-hover text-blue-600 font-semibold">
+                        Daftar
+                    </Link>
+                </div>
+
             </fieldset>
         </div>
     );

@@ -14,17 +14,17 @@ export default function GlobalSpeedDial() {
   return (
     <div className="fab">
       {/* a focusable div with tabIndex is necessary to work on all browsers. role="button" is necessary for accessibility */}
-      <div tabIndex={0} role="button" className="btn btn-lg btn-circle btn-success">F</div>
+      <div tabIndex={0} role="button" className="btn btn-lg btn-circle btn-success">J</div>
 
       {/* buttons that show up when FAB is open */}
       <Link href={"/"}>
-        <div>Home <button className="btn btn-lg btn-circle">A</button></div>
+        <div>Home <button className="btn btn-lg btn-circle">H</button></div>
       </Link>
       <Link href={"/tracker"}>
-        <div>Tracker <button className="btn btn-lg btn-circle">B</button></div>
+        <div>Tracker <button className="btn btn-lg btn-circle">T</button></div>
       </Link>
       <Link href={"/statistic"}>
-        <div>Detail <button className="btn btn-lg btn-circle">C</button></div>
+        <div>Detail <button className="btn btn-lg btn-circle">A</button></div>
       </Link>
     </div>
   )

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import * as React from "react";
 import Link from "next/link";
+import Heatmap from "@/component/Heatmap"
 
 export default function Home() {
   return (
@@ -31,7 +32,7 @@ export default function Home() {
 
         <div className="flex flex-col w-136 gap-4 mx-auto ">
           <p className="text-center">been productive for .. hour</p>
-          <div className="h-48  bg-blue-200">heatmap</div>
+          <Heatmap/>
           <div className="flex justify-around ">
             <p>daily avg</p>
             <p>longest streak</p>
@@ -40,7 +41,7 @@ export default function Home() {
         </div>
 
         <div className="flex justify-center">
-          <Link href={"/track"}>
+          <Link href={"/tracker"}>
             <button className="btn mx-auto">Track</button>
           </Link>
 
