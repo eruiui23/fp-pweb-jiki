@@ -2,12 +2,17 @@
 
 import { useEffect, useState } from "react";
 
-export default function Stopwatch() {
-    //stopwatch
+// 1. Tambahkan Interface Props
+interface StopwatchProps {
+  onFinish?: (duration: number) => void; // Fungsi untuk lapor ke Tracker
+}
+
+// 2. Terima props di sini
+export default function Stopwatch({ onFinish }: StopwatchProps) {
+    
+    // stopwatch state
     const [totalSec, setTotalSec] = useState(0)
     const [isActive, setIsActive] = useState(false)
-
-    const toggle = () => (setIsActive(!isActive))
 
     const reset = () => {
         setTotalSec(0)
@@ -30,23 +35,15 @@ export default function Stopwatch() {
                 clearInterval(interval)
             }
         }
-
-
-    }, [isActive])
-
+    }, [isActive, totalSec]) // Tambahkan totalSec di dependency biar aman
 
     const hours = Math.floor(totalSec / 3600);
     const minutes = Math.floor((totalSec % 3600) / 60);
     const seconds = totalSec % 60;
 
-    // button
-
-    let initialText = "Start"
-    // let isRunning = false
-    // let isPaused = false
+    // button state
     const [isRunning, setIsRunning] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
-
     const [buttonText, setButtonText] = useState("Start")
 
     const handleButton = () => {
@@ -57,8 +54,7 @@ export default function Stopwatch() {
             setIsPaused(false)
             setIsActive(true)
         }
-
-        // running
+        // pause
         else if (!isPaused) {
             setButtonText("Continue")
             setIsPaused(true)
@@ -66,25 +62,42 @@ export default function Stopwatch() {
         }
     }
 
+    // --- 3. MODIFIKASI HANDLE END ---
     const handleEnd = () => {
+        // Simpan durasi saat ini sebelum di-reset
+        const finalDuration = totalSec;
+
+        // Panggil fungsi onFinish (Kirim data ke Parent)
+        if (onFinish) {
+            onFinish(finalDuration);
+        }
+        
+        alert(`Stopwatch Selesai! Durasi: ${formatTime(finalDuration)} tersimpan.`);
+
+        // Reset UI
         setIsRunning(false)
         setIsPaused(false)
         setButtonText("Start")
-        reset()
-        // call post buat naro statistik handle end
-
+        reset() 
     }
 
+    // Helper kecil buat alert biar cantik (opsional)
+    const formatTime = (secs: number) => {
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+        return `${h}j ${m}m ${s}d`;
+    }
 
     return (
         <div className="flex flex-col justify-between items-center gap-8 relative">
-            {/* For TSX uncomment the commented types below */}
+            
             <div
                 className={`
                     transition-all duration-300 rounded-xl p-4
                     ${!isRunning ? "cursor-pointer hover:bg-base-200 hover:scale-105" : "cursor-default"}
                 `}
-                title={!isRunning ? "Klik angka untuk ubah waktu" : "Timer sedang berjalan"}
+                title={!isRunning ? "Stopwatch siap" : "Stopwatch sedang berjalan"}
             >
 
                 <span className="countdown font-mono text-8xl select-none">
@@ -100,14 +113,19 @@ export default function Stopwatch() {
             </div>
 
             <div className="text-center flex flex-col gap-4 w-full items-center">
-                <button className="btn w-40 btn-lg" onClick={() => handleButton()}>{buttonText}</button>
+                <button 
+                    className={`btn w-40 btn-lg ${isActive ? "btn-warning" : "btn-primary"}`} 
+                    onClick={() => handleButton()}
+                >
+                    {buttonText}
+                </button>
 
                 {isRunning ? (
                     <button className="btn btn-ghost text-error" onClick={handleEnd}>
                         End
                     </button>
                 ) : (
-                    <div className="btn btn-ghost invisible"></div>
+                    <div className="btn btn-ghost invisible">Placeholder</div>
                 )}
             </div>
         </div>

@@ -22,21 +22,17 @@ export default function LoginPage() {
                 body: JSON.stringify({ usn: username, pass: password }),
             });
 
-            const responseJson = await res.json(); // Saya ganti nama variabel jadi responseJson biar jelas
+            const responseJson = await res.json(); 
 
             if (res.ok) {
-                // PERBAIKAN DI SINI:
-                // Cek apakah responseJson.data ada, lalu ambil token dari dalamnya
                 if (responseJson.data && responseJson.data.token) {
                     
-                    // 1. Simpan Token (Ambil dari .data.token)
                     localStorage.setItem("token", responseJson.data.token);
                     
-                    // 2. Simpan User (Ambil dari .data.user)
                     localStorage.setItem("user", JSON.stringify(responseJson.data.user));
                     
                     alert("Login Berhasil!");
-                    router.push("/tracker");
+                    router.push("/");
                 } else {
                     console.error("Struktur respon tidak sesuai:", responseJson);
                     setError("Login berhasil, tapi token tidak ditemukan.");

@@ -23,12 +23,12 @@ export default function GlobalSpeedDial() {
       <Link href={"/tracker"}>
         <div>Tracker <button className="btn btn-lg btn-circle">T</button></div>
       </Link>
-      <Link href={"/statistic"}>
+      {/* <Link href={"/statistic"}>
         <div>Detail <button className="btn btn-lg btn-circle">A</button></div>
-      </Link>
+      </Link> */}
 
       <Link href={"/tasks"}>
-        <div>List <button className="btn btn-lg btn-circle">L</button></div>
+        <div>Task List <button className="btn btn-lg btn-circle">L</button></div>
       </Link>
     </div>
   )

@@ -1,22 +1,17 @@
 import prisma from "@/lib/prisma";
 import { verifyToken, extractTokenFromHeader } from "@/lib/jwt";
-import { CreateTrackerSchema } from "@/lib/validation";
-import { createErrorResponse, createSuccessResponse, handleZodError } from "@/lib/errors";
+import { createErrorResponse, createSuccessResponse } from "@/lib/errors";
 
-// GET all trackers for authenticated user
+// GET all trackers
 export async function GET(req: Request) {
   try {
     const authHeader = req.headers.get("authorization");
     const token = extractTokenFromHeader(authHeader ?? undefined);
 
-    if (!token) {
-      return createErrorResponse(401, "Unauthorized: Missing token");
-    }
+    if (!token) return createErrorResponse(401, "Unauthorized: Missing token");
 
     const payload = verifyToken(token);
-    if (!payload) {
-      return createErrorResponse(401, "Unauthorized: Invalid token");
-    }
+    if (!payload) return createErrorResponse(401, "Unauthorized: Invalid token");
 
     const trackers = await prisma.tracker.findMany({
       where: { userId: payload.usn },
@@ -27,7 +22,11 @@ export async function GET(req: Request) {
         taskId: true,
         createdAt: true,
         updatedAt: true,
+        task: {
+            select: { task_name: true }
+        }
       },
+      orderBy: { createdAt: 'desc' } // Urutkan dari yang terbaru
     });
 
     return createSuccessResponse(trackers, 200, "Trackers retrieved successfully");
@@ -37,36 +36,33 @@ export async function GET(req: Request) {
   }
 }
 
-// POST create tracker
+// POST create tracker (FIX: Validasi Manual agar support NULL task_id)
 export async function POST(req: Request) {
   try {
     const authHeader = req.headers.get("authorization");
     const token = extractTokenFromHeader(authHeader ?? undefined);
 
-    if (!token) {
-      return createErrorResponse(401, "Unauthorized: Missing token");
-    }
+    if (!token) return createErrorResponse(401, "Unauthorized: Missing token");
 
     const payload = verifyToken(token);
-    if (!payload) {
-      return createErrorResponse(401, "Unauthorized: Invalid token");
-    }
+    if (!payload) return createErrorResponse(401, "Unauthorized: Invalid token");
 
     const body = await req.json();
 
-    // Validate input
-    const validation = CreateTrackerSchema.safeParse(body);
-    if (!validation.success) {
-      const errors = handleZodError(validation.error);
-      return createErrorResponse(400, "Validation failed", errors);
+    if (!body.tracker_type || body.duration === undefined) {
+        return createErrorResponse(400, "Validation failed: tracker_type and duration are required");
     }
 
-    const { tracker_type, duration, taskId } = validation.data;
+    const tracker_type = String(body.tracker_type);
+    const duration = Number(body.duration);
 
-    // If taskId is provided, verify it belongs to the user
-    if (taskId) {
+    let inputTaskId = body.task_id || body.taskId || null;
+    
+    if (inputTaskId === "") inputTaskId = null;
+
+    if (inputTaskId) {
       const task = await prisma.task.findUnique({
-        where: { task_id: taskId },
+        where: { task_id: inputTaskId },
       });
 
       if (!task || task.userId !== payload.usn) {
@@ -74,13 +70,12 @@ export async function POST(req: Request) {
       }
     }
 
-    // Create tracker
     const tracker = await prisma.tracker.create({
       data: {
         tracker_type,
         duration,
         userId: payload.usn,
-        taskId: taskId || null,
+        taskId: inputTaskId, 
       },
       select: {
         tracker_id: true,

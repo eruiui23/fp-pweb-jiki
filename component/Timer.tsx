@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-export default function Timer() {
+interface TimerProps {
+  onFinish?: (duration: number) => void;
+}
+
+export default function Timer({ onFinish }: TimerProps) {
     const [userMinutes, setUserMinutes] = useState(25);
     const [totalSec, setTotalSec] = useState(25 * 60);
     const [isActive, setIsActive] = useState(false);
@@ -12,24 +16,14 @@ export default function Timer() {
     const [isPaused, setIsPaused] = useState(false);
     const [buttonText, setButtonText] = useState("Start");
 
+    // --- 1. LOGIKA INTERVAL (Hanya mengurangi angka) ---
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null;
 
         if (isActive && totalSec > 0) {
             interval = setInterval(() => {
-                setTotalSec((sec) => {
-                    if (sec <= 1) {
-                        clearInterval(interval!);
-                        setIsActive(false);
-                        setIsRunning(false);
-                        setButtonText("Selesai");
-                        return 0;
-                    }
-                    return sec - 1;
-                });
+                setTotalSec((sec) => sec - 1);
             }, 1000);
-        } else if (!isActive && interval) {
-            clearInterval(interval);
         }
 
         return () => {
@@ -37,27 +31,47 @@ export default function Timer() {
         };
     }, [isActive, totalSec]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const rawValue = e.target.value; // Ambil string mentahnya dulu
+    // --- 2. LOGIKA SELESAI (Memantau jika angka mencapai 0) ---
+    // Dipisah ke useEffect sendiri biar Alert gak muncul 2x
+    useEffect(() => {
+        if (totalSec === 0 && isActive) {
+            // Matikan Timer
+            setIsActive(false);
+            setIsRunning(false);
+            setIsPaused(false);
+            
+            // Ubah tombol jadi "Start" sesuai request
+            setButtonText("Start"); 
+            
+            // Kembalikan angka ke durasi awal (Reset UI)
+            const initialDuration = userMinutes * 60;
+            // setTotalSec(initialDuration); // Opsional: kalau mau langsung balik ke angka 25:00
 
-        // 1. Cek: Kalau kosong (user hapus semua), set ke 0
+            // Simpan ke Database
+            if (onFinish) {
+                onFinish(initialDuration);
+            }
+
+            // Alert muncul 1x saja
+            alert("Waktu Habis! Progress disimpan.");
+        }
+    }, [totalSec, isActive, onFinish, userMinutes]);
+
+
+    // --- HANDLER LAINNYA (Sama seperti kode lama) ---
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value;
         if (rawValue === "") {
             setUserMinutes(0);
             return;
         }
-
-        // 2. Kalau ada isinya, baru di-parse ke angka
         const val = parseInt(rawValue);
-
-        // 3. Validasi angka (harus angka valid dan tidak minus)
         if (!isNaN(val) && val >= 0) {
             setUserMinutes(val);
         }
     };
 
-    //  modal
     const openSettings = () => {
-        // 
         if (!isRunning) {
             const modal = document.getElementById('settings_modal') as HTMLDialogElement;
             if (modal) modal.showModal();
@@ -70,6 +84,7 @@ export default function Timer() {
 
     const handleButton = () => {
         if (!isRunning || isPaused) {
+            // Logika Start
             if (totalSec === 0 && userMinutes > 0) {
                 setTotalSec(userMinutes * 60);
             } else if (totalSec === 0) return;
@@ -80,6 +95,7 @@ export default function Timer() {
             setIsActive(true);
         }
         else if (!isPaused) {
+            // Logika Pause
             setButtonText("Continue");
             setIsPaused(true);
             setIsActive(false);
@@ -98,6 +114,7 @@ export default function Timer() {
         setTotalSec(userMinutes * 60);
     }
 
+    // --- RETURN JSX (SAMA PERSIS DESIGN LAMA) ---
     return (
         <div className="flex flex-col justify-between items-center gap-8 relative">
 
@@ -121,7 +138,7 @@ export default function Timer() {
                 </span>
             </div>
 
-            {/* 2. TOMBOL KONTROL */}
+            {/* TOMBOL KONTROL */}
             <div className="text-center flex flex-col gap-4 w-full items-center">
                 <button
                     className={`btn w-40 btn-lg ${isActive ? "btn-warning" : "btn-primary"}`}
@@ -130,7 +147,7 @@ export default function Timer() {
                     {buttonText}
                 </button>
 
-                {isRunning ? (
+                {isRunning || isPaused ? (
                     <button className="btn btn-ghost text-error" onClick={handleEnd}>
                         End / Reset
                     </button>
@@ -140,10 +157,6 @@ export default function Timer() {
             </div>
 
             <dialog id="settings_modal" className="modal">
-                {/* Fix Background: 
-                   - 'bg-white': Memaksa background putih solid 
-                   - 'text-black': Memastikan teks berwarna hitam agar kontras
-                */}
                 <div className="modal-box bg-white text-black">
                     <h3 className="font-bold text-lg mb-4">Timer Setting</h3>
 
@@ -155,7 +168,7 @@ export default function Timer() {
                             type="number"
                             value={userMinutes === 0 ? "" : userMinutes}
                             onChange={handleInputChange}
-                            placeholder="minute  "
+                            placeholder="minute"
                             className="input input-bordered w-full text-lg bg-gray-100 text-black border-gray-300"
                         />
                         <label className="label mt-2">
@@ -165,13 +178,10 @@ export default function Timer() {
 
                     <div className="modal-action">
                         <form method="dialog">
-                            {/* Tombol Simpan */}
                             <button className="btn btn-primary" onClick={saveAndClose}>Save & Close</button>
                         </form>
                     </div>
                 </div>
-
-                {/* Backdrop */}
                 <form method="dialog" className="modal-backdrop">
                     <button>close</button>
                 </form>

@@ -1,72 +1,73 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ActivityCalendar } from 'react-activity-calendar'; 
-import { subDays } from 'date-fns';
+import { addDays, format, parseISO, isSameDay, differenceInCalendarDays } from 'date-fns';
 
-interface HeatmapProps {
-  data?: Array<{ date: string; count: number; level: number }>;
+interface TrackerData {
+  createdAt: string;
+  duration: number;
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ data }) => {
+interface HeatmapProps {
+  trackers?: TrackerData[];
+}
+
+const Heatmap: React.FC<HeatmapProps> = ({ trackers = [] }) => {
   
-  // Logic generate data dummy
-  const generateMockData = () => {
+  const calendarData = useMemo(() => {
     const data = [];
     const today = new Date();
-    for (let i = 365; i >= 0; i--) {
-      const date = subDays(today, i).toISOString().split('T')[0];
-      const count = Math.floor(Math.random() * 10); 
-      
-      // Level menentukan seberapa gelap warnanya (0-4)
-      const level = count === 0 ? 0 : count < 3 ? 1 : count < 6 ? 2 : count < 9 ? 3 : 4;
-      
-      data.push({ date, count, level });
+    const currentYear = today.getFullYear();
+    
+    const startDate = new Date(currentYear, 0, 1); 
+    const endDate = new Date(currentYear, 11, 31); 
+
+    const daysInYear = differenceInCalendarDays(endDate, startDate) + 1;
+
+    for (let i = 0; i < daysInYear; i++) {
+      const currentDate = addDays(startDate, i);
+      const dateString = format(currentDate, 'yyyy-MM-dd');
+
+      const dailyTrackers = trackers.filter((t) => 
+        isSameDay(parseISO(t.createdAt), currentDate)
+      );
+
+      const totalSeconds = dailyTrackers.reduce((acc, curr) => acc + curr.duration, 0);
+      const totalMinutes = Math.floor(totalSeconds / 60);
+
+      let level = 0;
+      if (totalMinutes === 0) level = 0;
+      else if (totalMinutes <= 30) level = 1;
+      else if (totalMinutes <= 60) level = 2;
+      else if (totalMinutes <= 120) level = 3;
+      else level = 4;
+
+      data.push({
+        date: dateString,
+        count: totalMinutes,
+        level: level
+      });
     }
     return data;
-  };
+  }, [trackers]);
 
-  const finalData = data || generateMockData();
-
-  // 🎨 PALET WARNA BIRU
-  // Level 0 (Kosong) -> Level 4 (Paling Gelap/Banyak)
   const theme = {
-    light: [
-      '#ebedf0', // Level 0: Abu-abu (Kosong)
-      '#dbeafe', // Level 1: Biru Sangat Muda (Blue-100)
-      '#60a5fa', // Level 2: Biru Muda (Blue-400)
-      '#2563eb', // Level 3: Biru Sedang (Blue-600)
-      '#1e40af', // Level 4: Biru Tua (Blue-800)
-    ],
-    dark: [
-      '#161b22', // Level 0 (Dark mode)
-      '#1e3a8a', // Level 1
-      '#2563eb', // Level 2
-      '#3b82f6', // Level 3
-      '#60a5fa', // Level 4
-    ],
+    light: ['#ebedf0', '#dbeafe', '#60a5fa', '#2563eb', '#1e40af'],
+    dark: ['#161b22', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'],
   };
 
   return (
-    <div className="p-4 border rounded-xl shadow-sm bg-white max-w-full overflow-x-auto">
-      {/* <h3 className="text-lg font-semibold mb-4 text-gray-700">Productivity Streak</h3> */}
-      
+    <div className="w-full flex justify-center overflow-x-auto">
       <ActivityCalendar
-        data={finalData}
-        theme={theme} // <--- Ini yang mengubah warna jadi biru
-        blockSize={12}
+        data={calendarData}
+        theme={theme}
+        blockSize={10}
         blockMargin={4}
         fontSize={14}
-        // Label kustom
-        labels={{
-            legend: {
-                less: 'Sedikit',
-                more: 'Banyak'
-            },
-            months: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-            totalCount: '{{count}} aktivitas di tahun lalu'
-        }}
       />
+
+      
     </div>
   );
 };

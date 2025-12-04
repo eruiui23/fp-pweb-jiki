@@ -22,7 +22,7 @@ export default function RegisterPage() {
         setError("");
         setSuccess("");
 
-        // 1. Validasi Client-Side Sederhana
+     
         if (!username || !email || !password) {
             setError("Semua kolom wajib diisi!");
             return;
@@ -36,7 +36,7 @@ export default function RegisterPage() {
         setIsLoading(true);
 
         try {
-            // 2. TEMBAK API REGISTER
+           
             const res = await fetch("http://localhost:3000/api/auth/register", {
                 method: "POST",
                 headers: {
