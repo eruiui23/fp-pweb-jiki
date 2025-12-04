@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // Import Router untuk redirect logout
+import { useRouter } from "next/navigation"; 
 import Heatmap from "@/component/Heatmap"; 
-import { UserCircle, LogOut, LogIn } from "lucide-react"; // Import Icon tambahan
+import { UserCircle, LogOut, LogIn } from "lucide-react"; 
 import { 
   parseISO, 
   startOfDay, 
@@ -21,23 +21,19 @@ export default function Home() {
   const [trackers, setTrackers] = useState<TrackerData[]>([]);
   const [username, setUsername] = useState("User");
   
-  // State untuk status login
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // --- FETCH DATA & CEK LOGIN ---
   useEffect(() => {
     const initData = async () => {
       const token = localStorage.getItem("token");
       const userStr = localStorage.getItem("user");
 
-      // 1. Cek Login Status
       if (token) {
         setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
       }
 
-      // 2. Set Username
       if (userStr) {
         try {
           const userObj = JSON.parse(userStr);
@@ -47,7 +43,7 @@ export default function Home() {
 
       if (!token) return;
 
-      // 3. Fetch Data (Hanya kalau ada token)
+      // fetch data
       try {
         const res = await fetch("http://localhost:3000/api/trackers", {
           headers: { Authorization: `Bearer ${token}` }
@@ -66,22 +62,18 @@ export default function Home() {
     initData();
   }, []);
 
-  // --- FUNGSI LOGOUT ---
   const handleLogout = () => {
-    // Hapus data dari localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     
-    // Update state
     setIsLoggedIn(false);
     setUsername("Guest");
-    setTrackers([]); // Kosongkan data tracker
+    setTrackers([]); 
     
-    // Redirect ke login (opsional, atau diam di home)
     router.push("/login");
   };
 
-  // --- HITUNG STATISTIK ---
+  // statistic
   const stats = useMemo(() => {
     if (trackers.length === 0) {
       return { totalHours: "0.0", dailyAvg: "0.0", currentStreak: 0, longestStreak: 0 };
@@ -134,16 +126,12 @@ export default function Home() {
 
 
   return (
-    // 'relative' penting agar posisi absolute anak mengacu ke container ini
     <div className="flex flex-col justify-center h-screen items-center relative bg-base-100">
       
-      {/* --- ICON PROFILE / AUTH (POJOK KANAN ATAS) --- */}
       <div className="absolute top-6 right-6 z-50">
         {isLoggedIn ? (
-          // KONDISI 1: SUDAH LOGIN (Tampilkan Dropdown Logout)
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle hover:bg-base-200">
-               {/* Hapus class avatar/placeholder biar icon pas ditengah */}
                <UserCircle size={32} />
             </div>
             <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 border border-base-200">
@@ -159,7 +147,6 @@ export default function Home() {
             </ul>
           </div>
         ) : (
-          // KONDISI 2: BELUM LOGIN (Link ke Login)
           <Link href="/login">
             <button className="btn btn-ghost btn-circle hover:bg-base-200" title="Login">
                <LogIn size={30} />
@@ -168,7 +155,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* --- KONTEN UTAMA --- */}
       <div className="flex flex-col gap-4 w-full max-w-4xl px-4">
         
         <h1 className="text-center text-7xl mb-10 font-bold text-base-content">

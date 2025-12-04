@@ -16,7 +16,6 @@ export default function Timer({ onFinish }: TimerProps) {
     const [isPaused, setIsPaused] = useState(false);
     const [buttonText, setButtonText] = useState("Start");
 
-    // --- 1. LOGIKA INTERVAL (Hanya mengurangi angka) ---
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null;
 
@@ -31,34 +30,26 @@ export default function Timer({ onFinish }: TimerProps) {
         };
     }, [isActive, totalSec]);
 
-    // --- 2. LOGIKA SELESAI (Memantau jika angka mencapai 0) ---
-    // Dipisah ke useEffect sendiri biar Alert gak muncul 2x
     useEffect(() => {
         if (totalSec === 0 && isActive) {
-            // Matikan Timer
+
             setIsActive(false);
             setIsRunning(false);
             setIsPaused(false);
             
-            // Ubah tombol jadi "Start" sesuai request
             setButtonText("Start"); 
             
-            // Kembalikan angka ke durasi awal (Reset UI)
             const initialDuration = userMinutes * 60;
-            // setTotalSec(initialDuration); // Opsional: kalau mau langsung balik ke angka 25:00
 
-            // Simpan ke Database
             if (onFinish) {
                 onFinish(initialDuration);
             }
 
-            // Alert muncul 1x saja
             alert("Waktu Habis! Progress disimpan.");
         }
     }, [totalSec, isActive, onFinish, userMinutes]);
 
 
-    // --- HANDLER LAINNYA (Sama seperti kode lama) ---
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value;
         if (rawValue === "") {
@@ -114,7 +105,6 @@ export default function Timer({ onFinish }: TimerProps) {
         setTotalSec(userMinutes * 60);
     }
 
-    // --- RETURN JSX (SAMA PERSIS DESIGN LAMA) ---
     return (
         <div className="flex flex-col justify-between items-center gap-8 relative">
 
@@ -138,7 +128,7 @@ export default function Timer({ onFinish }: TimerProps) {
                 </span>
             </div>
 
-            {/* TOMBOL KONTROL */}
+            {/* control button */}
             <div className="text-center flex flex-col gap-4 w-full items-center">
                 <button
                     className={`btn w-40 btn-lg ${isActive ? "btn-warning" : "btn-primary"}`}

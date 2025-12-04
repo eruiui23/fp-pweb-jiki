@@ -7,13 +7,11 @@ import Link from "next/link";
 export default function RegisterPage() {
     const router = useRouter();
 
-    // --- STATE INPUT ---
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    // --- STATE UI ---
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +40,7 @@ export default function RegisterPage() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                // Body disesuaikan dengan docs: usn, email, pass
+                
                 body: JSON.stringify({
                     usn: username,
                     email: email,
@@ -50,15 +48,13 @@ export default function RegisterPage() {
                 }),
             });
 
-            // 3. HANDLE RESPONSE
             if (res.ok) {
                 setSuccess("Registrasi berhasil! Mengalihkan ke login...");
-                // Tunggu 1.5 detik biar user baca pesan sukses, lalu pindah halaman
+                // delay
                 setTimeout(() => {
                     router.push("/login");
                 }, 1500);
             } else {
-                // Coba ambil pesan error dari server jika ada
                 const data = await res.json();
                 setError(data.message || "Registrasi gagal. Coba username/email lain.");
             }
@@ -76,7 +72,6 @@ export default function RegisterPage() {
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-6 shadow-lg">
                 <legend className="fieldset-legend text-lg font-bold px-2">Register</legend>
 
-                {/* USERNAME (usn) */}
                 <label className="label">
                     <span className="label-text">Username</span>
                 </label>
@@ -88,7 +83,6 @@ export default function RegisterPage() {
                     onChange={(e) => setUsername(e.target.value)}
                 />
 
-                {/* EMAIL (email) */}
                 <label className="label mt-2">
                     <span className="label-text">Email</span>
                 </label>
@@ -100,7 +94,6 @@ export default function RegisterPage() {
                     onChange={(e) => setEmail(e.target.value)}
                 />
 
-                {/* PASSWORD (pass) */}
                 <label className="label mt-2">
                     <span className="label-text">Password</span>
                 </label>
@@ -112,7 +105,6 @@ export default function RegisterPage() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
 
-                {/* CONFIRM PASSWORD (Validasi Lokal) */}
                 <label className="label mt-2">
                     <span className="label-text">Confirm Password</span>
                 </label>
@@ -124,7 +116,6 @@ export default function RegisterPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 
-                {/* --- FEEDBACK MESSAGE --- */}
                 {error && (
                     <div className="mt-4 p-2 text-xs text-red-600 bg-red-100 border border-red-200 rounded text-center">
                         {error}

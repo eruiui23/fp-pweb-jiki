@@ -14,7 +14,6 @@ export default function Tracker() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [selectedTaskId, setSelectedTaskId] = useState<string>("");
 
-    // --- FETCH DATA ---
     useEffect(() => {
         const fetchTasks = async () => {
             const token = localStorage.getItem("token"); 
@@ -46,7 +45,7 @@ export default function Tracker() {
         fetchTasks();
     }, []);
 
-    // --- FUNGSI SIMPAN TRACKER ---
+    // save tracker to database
     const handleSaveTracker = async (durationInSeconds: number) => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -99,7 +98,7 @@ export default function Tracker() {
                 </button>
             </div>
 
-            {/* --- AREA DROPDOWN DENGAN TOMBOL CLEAR --- */}
+            {/* dropdown */}
             <div className="form-control w-full max-w-xs text-center relative">
                 <label className="label justify-center pb-2">
                     <span className="label-text font-bold text-lg"></span>
@@ -111,7 +110,6 @@ export default function Tracker() {
                         value={selectedTaskId}
                         onChange={(e) => setSelectedTaskId(e.target.value)}
                     >
-                        {/* Opsi default untuk Unselect */}
                         <option className="text-center" value="">unassigned</option>
                         
                         {tasks.length > 0 ? (
@@ -121,14 +119,13 @@ export default function Tracker() {
                                 </option>
                             ))
                         ) : (
-                            <option value="" disabled>Tidak ada task</option>
+                            <option value="" disabled>No Task</option>
                         )}
                     </select>
 
-                    {/* TOMBOL CLEAR (X) - Hanya muncul jika ada task yang dipilih */}
                     {selectedTaskId && (
                         <button
-                            onClick={() => setSelectedTaskId("")} // Reset ke string kosong
+                            onClick={() => setSelectedTaskId("")} // reset to empty string
                             className="btn btn-circle btn-ghost btn-xs absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 hover:bg-gray-100"
                             title="Hapus pilihan task"
                         >

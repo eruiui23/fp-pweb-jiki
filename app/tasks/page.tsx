@@ -164,7 +164,7 @@ export default function TaskPage() {
     <div className="min-h-screen bg-base-100 p-8 flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-8 text-center">Task Manager</h1>
 
-      {/* --- FORM ADD TASK --- */}
+      {/* add task */}
       <div className="card w-full max-w-lg bg-base-200 shadow-xl mb-8">
         <div className="card-body">
           <h2 className="card-title text-sm opacity-70">Add New Task (Database)</h2>
@@ -210,13 +210,13 @@ export default function TaskPage() {
         </div>
       </div>
 
-      {/* --- LIST TASK --- */}
+      {/* task list */}
       <div className="w-full max-w-lg">
         <h2 className="text-xl font-semibold mb-4">My Tasks ({tasks.length})</h2>
 
         {tasks.length === 0 ? (
           <p className="text-center text-gray-500 italic">
-             {isLoading ? "Loading data..." : "Belum ada task di database."}
+             {isLoading ? "Loading data..." : "No task in database"}
           </p>
         ) : (
           <div className="flex flex-col gap-3">

@@ -2,9 +2,7 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-// import "@/component/GlobalSpeedDial" // Opsional jika tidak dipakai
 import GlobalSpeedDial from "@/component/GlobalSpeedDial";
-// 1. IMPORT ProfileButton
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

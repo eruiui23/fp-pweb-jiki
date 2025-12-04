@@ -2,15 +2,12 @@
 
 import { useEffect, useState } from "react";
 
-// 1. Tambahkan Interface Props
 interface StopwatchProps {
   onFinish?: (duration: number) => void; // Fungsi untuk lapor ke Tracker
 }
 
-// 2. Terima props di sini
 export default function Stopwatch({ onFinish }: StopwatchProps) {
-    
-    // stopwatch state
+    //state
     const [totalSec, setTotalSec] = useState(0)
     const [isActive, setIsActive] = useState(false)
 
@@ -35,7 +32,7 @@ export default function Stopwatch({ onFinish }: StopwatchProps) {
                 clearInterval(interval)
             }
         }
-    }, [isActive, totalSec]) // Tambahkan totalSec di dependency biar aman
+    }, [isActive, totalSec]) 
 
     const hours = Math.floor(totalSec / 3600);
     const minutes = Math.floor((totalSec % 3600) / 60);
@@ -62,26 +59,22 @@ export default function Stopwatch({ onFinish }: StopwatchProps) {
         }
     }
 
-    // --- 3. MODIFIKASI HANDLE END ---
     const handleEnd = () => {
-        // Simpan durasi saat ini sebelum di-reset
         const finalDuration = totalSec;
 
-        // Panggil fungsi onFinish (Kirim data ke Parent)
         if (onFinish) {
             onFinish(finalDuration);
         }
         
         alert(`Stopwatch Selesai! Durasi: ${formatTime(finalDuration)} tersimpan.`);
 
-        // Reset UI
+        // reset
         setIsRunning(false)
         setIsPaused(false)
         setButtonText("Start")
         reset() 
     }
 
-    // Helper kecil buat alert biar cantik (opsional)
     const formatTime = (secs: number) => {
         const h = Math.floor(secs / 3600);
         const m = Math.floor((secs % 3600) / 60);
