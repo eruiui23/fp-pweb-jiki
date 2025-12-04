@@ -6,7 +6,7 @@ export async function withAuth(
   handler: (req: NextRequest, context: { params?: Record<string, string> }) => Promise<Response>
 ) {
   return async (req: NextRequest, context: { params?: Record<string, string> } = {}) => {
-    const token = extractTokenFromHeader(req.headers.get("authorization"));
+    const token = extractTokenFromHeader(req.headers.get("authorization") ?? undefined);
 
     if (!token) {
       return createErrorResponse(401, "Unauthorized: Missing token");
