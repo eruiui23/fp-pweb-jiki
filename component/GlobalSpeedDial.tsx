@@ -26,6 +26,10 @@ export default function GlobalSpeedDial() {
       <Link href={"/statistic"}>
         <div>Detail <button className="btn btn-lg btn-circle">A</button></div>
       </Link>
+
+      <Link href={"/tasks"}>
+        <div>List <button className="btn btn-lg btn-circle">L</button></div>
+      </Link>
     </div>
   )
 }
